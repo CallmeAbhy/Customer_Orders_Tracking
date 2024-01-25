@@ -1,6 +1,5 @@
-Certainly! Below is a simple template for your README.md file. Feel free to customize it further according to your project details.
 
-```markdown
+
 # Customer Tracking App
 
 ![GitHub](https://img.shields.io/github/license/your-username/your-repo)
@@ -20,9 +19,9 @@ The Customer Tracking App is a web application developed to track and manage cus
 
 1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/your-username/your-repo.git
-   ```
+
+   git clone https://github.com/CallmeAbhy/Customer_Orders_Tracking.git
+
 
 2. Open the [Customer Tracking App](https://script.google.com/macros/s/AKfycbyLwc1jU4jjspCHpkCxOdjNK-DoSbpfTYEShI59KcIJumuYhite_-eiOA1SZU0ONY6oYw/exec) web app.
 
@@ -50,6 +49,3 @@ Contributions are welcome! Read the [Contributing Guidelines](CONTRIBUTING.md) f
 
 This project is licensed under the [MIT License](LICENSE).
 
-```
-
-Make sure to replace placeholders like `your-username` and `your-repo` with your actual GitHub username and repository name. Additionally, you can create separate files like `CONTRIBUTING.md` and `LICENSE` if you want to include more detailed contributing guidelines and licensing information.
