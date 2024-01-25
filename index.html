@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+  <style>
+        body {
+        margin: 20px;
+    }
+        #result {
+        margin: 20px;
+    }
+
+
+</style>
+
+<div class="max-w-full mx-auto bg-white shadow-md">
+    <h1 class="text-2xl font-semibold p-3 md:p-6 lg:p-10">Customer Tracking App</h1>
+
+    <form id="customerSearchForm" onsubmit="searchCustomer(); return false;" class="space-y-4 p-6 md:p-10 lg:p-20">
+        <div class="mb-4">
+            <label for="customerId" class="block text-sm font-medium text-gray-600">Enter Customer ID:</label>
+            <input type="text" id="customerId" name="customerId" class="mt-1 p-2 border rounded-md w-full" required>
+        </div>
+
+        <div class="flex items-center justify-center">
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800">
+                Get Details
+            </button>
+        </div>
+    </form>
+
+    <div id="result" class="mt-8 overflow-y-auto"></div>
+</div>
+
+</div>
+
+
+
+
+    <script>
+    function searchCustomer() {
+        var customerId = document.getElementById('customerId').value;
+        google.script.run.withSuccessHandler(displayResult).searchCustomer(customerId);
+    }
+
+    function displayResult(result) {
+        var resultContainer = document.getElementById('result');
+        resultContainer.innerHTML = '';
+
+        if (result.length === 0) {
+            resultContainer.innerHTML = '<p>No matching records found.</p>';
+        } else {
+
+          var totalOrders = result.length;
+
+          
+        resultContainer.innerHTML += '<div class="mt-4">';
+        resultContainer.innerHTML += '<h2 class="text-lg font-semibold mb-2">Order Statistics</h2>';
+
+        var soapingCount = 0;
+        var soapWashCount = 0;
+        var pickingCount = 0;
+        var preAcidCount = 0;
+        var finalAcidCount = 0;
+        var finalWashCount = 0;
+        var w3w4Count = 0;
+        var remillingCount = 0;
+        var loadingCount = 0;
+        var unloadingCount = 0;
+
+        for (var i = 0; i < result.length; i++) {
+            // Assuming the column indices for each phase
+            var soapingIndex = 5;
+            var soapWashIndex = 6;
+            var pickingIndex = 7;
+            var preAcidIndex = 8;
+            var finalAcidIndex = 9;
+            var finalWashIndex = 10;
+            var w3w4Index = 11;
+            var remillingIndex = 12;
+            var loadingIndex = 13;
+            var unloadingIndex = 14;
+
+            soapingCount += result[i][soapingIndex] === 1 ? 1 : 0;
+            soapWashCount += result[i][soapWashIndex] === 1 ? 1 : 0;
+            pickingCount += result[i][pickingIndex] === 1 ? 1 : 0;
+            preAcidCount += result[i][preAcidIndex] === 1 ? 1 : 0;
+            finalAcidCount += result[i][finalAcidIndex] === 1 ? 1 : 0;
+            finalWashCount += result[i][finalWashIndex] === 1 ? 1 : 0;
+            w3w4Count += result[i][w3w4Index] === 1 ? 1 : 0;
+            remillingCount += result[i][remillingIndex] === 1 ? 1 : 0;
+            loadingCount += result[i][loadingIndex] === 1 ? 1 : 0;
+            unloadingCount += result[i][unloadingIndex] === 1 ? 1 : 0;
+        }
+
+        // Display stats
+        var totalOrders = result.length;
+
+var orderStatuses = [
+    { phase: 'Soaping', count: soapingCount },
+    { phase: 'Soap Wash', count: soapWashCount },
+    { phase: 'Picking', count: pickingCount },
+    { phase: 'Pre Acid', count: preAcidCount },
+    { phase: 'Final Acid', count: finalAcidCount },
+    { phase: 'Final Wash', count: finalWashCount },
+    { phase: 'W3/W4', count: w3w4Count },
+    { phase: 'Remilling', count: remillingCount },
+    { phase: 'Loading', count: loadingCount },
+    { phase: 'Unloading', count: unloadingCount }
+];
+
+resultContainer.innerHTML += '<div class="mt-4">';
+
+
+var orderStatusHTML = orderStatuses.map(status => {
+    var completionPercentage = (status.count / totalOrders) * 100;
+    var completionText = status.count > 0 ? `${status.count} Sheets are completed` : 'No orders completed';
+
+    return `
+        <div class="flex items-center mb-2">
+            <p class="w-1/4">${status.phase}:</p>
+            <div class="relative flex-1 ml-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs">${completionText}</span>
+                    <span class="text-xs">${totalOrders} Sheets</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-md overflow-hidden">
+                    <div class="h-full bg-green-500" style="width: ${completionPercentage}%;"></div>
+                </div>
+            </div>
+        </div>`;
+});
+
+resultContainer.innerHTML += orderStatusHTML.join('');
+
+resultContainer.innerHTML += '</div>';
+
+resultContainer.innerHTML += '<h2 class="text-lg font-semibold mb-4">Your Order Details</h2>';
+
+var table = document.createElement('table');
+table.classList.add('w-full', 'overflow-x-auto', 'shadow', 'rounded-lg', 'table-auto');
+
+var thead = document.createElement('thead');
+var headerRow = document.createElement('tr');
+var headers = ['TRACK NO.', 'THK', 'QUAL', 'DEN', 'CUST', 'SOAPING', 'SOAP WASH', 'PICKING', 'PRE ACID', 'FINAL ACID', 'FINAL WASH', 'W3/W4', 'REMILLING', 'LOADING', 'UNLOADING'];
+
+headers.forEach(function (headerText) {
+    var th = document.createElement('th');
+    th.classList.add('px-4', 'py-2', 'lg:px-6', 'lg:py-3');
+    th.textContent = headerText;
+    headerRow.appendChild(th);
+});
+
+thead.appendChild(headerRow);
+table.appendChild(thead);
+
+var tbody = document.createElement('tbody');
+result.forEach(function (rowData) {
+    var row = document.createElement('tr');
+    rowData.forEach(function (cellData, columnIndex) {
+        var td = document.createElement('td');
+        td.classList.add('px-4', 'py-2', 'lg:px-6', 'lg:py-3', 'text-gray-700');
+
+        // Convert 1 to ✅ and other values to an empty string for specific columns
+        if (columnIndex >= 5 && columnIndex <= 14) {
+            td.textContent = cellData === 1 ? '✅' : '';
+        } else {
+            td.textContent = cellData;
+        }
+
+        row.appendChild(td);
+    });
+    tbody.appendChild(row);
+});
+
+table.appendChild(tbody);
+resultContainer.appendChild(table);
+
+
+
+resultContainer.innerHTML += '<h2 class="text-lg font-semibold my-4">Dashboard</h2>';
+
+        // Create a canvas for the chart
+        resultContainer.innerHTML += '<canvas id="statusChart" class="mt-4" width="400" height="200"></canvas>';
+
+        // Define colors based on completion percentage
+        function getColor(percentage) {
+            if (percentage === 100) {
+                return 'rgba(0, 128, 0, 1)'; // Dark Green
+            } else if (percentage >= 75) {
+                return 'rgba(0, 255, 0, 0.5)'; // Light Green
+            } else if (percentage >= 50) {
+                return 'rgba(255, 255, 0, 0.5)'; // Yellow
+            } else if (percentage >= 25) {
+                return 'rgba(255, 165, 0, 0.5)'; // Orange
+            } else {
+                return 'rgba(255, 0, 0, 0.5)'; // Red
+            }
+        }
+
+        // Create a chart with Chart.js
+        var ctx = document.getElementById('statusChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Soaping', 'Soap Wash', 'Picking', 'Pre Acid', 'Final Acid', 'Final Wash', 'W3/W4', 'Remilling', 'Loading', 'Unloading'],
+                datasets: [{
+                    label: 'Percentage of Work Completed',
+                    data: [
+                        (soapingCount / totalOrders) * 100,
+                        (soapWashCount / totalOrders) * 100,
+                        (pickingCount / totalOrders) * 100,
+                        (preAcidCount / totalOrders) * 100,
+                        (finalAcidCount / totalOrders) * 100,
+                        (finalWashCount / totalOrders) * 100,
+                        (w3w4Count / totalOrders) * 100,
+                        (remillingCount / totalOrders) * 100,
+                        (loadingCount / totalOrders) * 100,
+                        (unloadingCount / totalOrders) * 100
+                    ],
+                    backgroundColor: function (context) {
+                        return getColor(context.dataset.data[context.dataIndex]);
+                    },
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+
+
+
+
+        
+
+
+          
+
+
+
+
+        }
+    }
+
+    
+</script>
+
+
+  </body>
+</html>
+
+
+
